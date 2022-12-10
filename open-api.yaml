@@ -1,0 +1,287 @@
+openapi: 3.0.3
+info:
+  title: iTop REST API Gateway
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /v1/{objectClass}:
+    parameters:
+      - $ref: '#/components/parameters/objectClassParameter'
+    get:
+      operationId: getObjectList
+      summary: Get a list of objects of the class
+      parameters:
+        - name: output_fields
+          description: Mapped to the `output_fields` property in standard json_data.
+          in: query
+          required: false
+          schema:
+            type: string
+            default: id,friendlyname
+            example: title,description,agent_id_friendlyname
+        - name: limit
+          description: Mapped to the `limit` property in standard json_data.
+          in: query
+          required: false
+          schema:
+            type: number
+            format: int
+            default: 100
+        - name: page
+          description: Mapped to the `page` property in standard json_data.
+          in: query
+          required: false
+          schema:
+            type: number
+            format: int
+            default: 1
+        - name: where
+          description: OQL search condition, mapped to the `key` property in standard json_data.
+          in: query
+          required: false
+          schema:
+            type: string
+            example: agent_id = 34 AND start_date > CURRENT_DATE()
+        - name: filter
+          description: Full OQL search query, mapped to the `key` property in standard json_data.
+          in: query
+          required: false
+          schema:
+            type: string
+            example: SELECT UserRequest AS ur WHERE ur.agent_id = 34 AND ur.start_date > CURRENT_DATE()
+      responses:
+        200:
+          description: List of objects with pagination
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  objects:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ObjectSchema'
+                  code:
+                    type: number
+                    format: integer
+                  message:
+                    type: string
+                    example: "Found: 11"
+                  pagination:
+                    type: object
+                    properties:
+                      count:
+                        type: number
+                        format: integer
+                        description: Number of objects in the current response
+                        example: 1
+                      page:
+                        type: number
+                        format: integer
+                        description: Current page number
+                        example: 2
+                      limit:
+                        type: number
+                        format: integer
+                        description: Limit per page
+                        example: 10
+                      total:
+                        type: number
+                        format: integer
+                        description: Total objects
+                        example: 11
+        400:
+          description: |-
+            **Bad Request** – Invalid request parameters or body
+            
+            Includes next codes from standard response:
+            - 13 INVALID_PAGE The request page number is not valid. It must be an integer greater than 0
+        401:
+          description: |-
+            **Unauthorized** – Authentication failed
+            
+            When this occurs, iTop sends `text/html` page instead of `application/json` in response to a request with incorrect credentials. A part of the original response body will be included in the `message` for debugging, and the `code` will be missing.
+        403:
+          description: |-
+            **Forbidden** – User does not have enough rights to perform the request
+            
+            Includes next codes from standard response:
+              - 1 UNAUTHORIZED Missing/wrong credentials or the user does not have enough rights to perform the requested operation
+        404:
+          description: |- 
+            **Not Found** – Requested URL is invalid or object with the ID not exist.
+        422:
+          description: |-
+            **Unprocessable Entity** – the request is syntactically correct, but for some reason cannot be processed.
+            
+            Includes next codes from standard response:
+            - 12 UNSAFE The requested operation cannot be performed because it can cause data (integrity) loss
+            - 100 INTERNAL_ERROR The operation could not be performed, see the message for troubleshooting
+              
+              Code 100 with next messages:
+              - *Error: {att_code}: No item found with criteria ...* – When trying to set a non-existent object as a property value using JSON
+              - `Error: {att_code}: Invalid object ...` – When trying to set a non-existent object as a property value using Id
+              - `Missing mandatory attribute(s) for applying the stimulus ...`
+              - `Invalid stimulus: '{stimulus}' on the object ...`
+              - `Error: Found issue(s): target_class = {class}, target_id = {id} ...` – When deletion plan required manual operations
+        500:
+          description: |-
+          
+            Includes next codes from standard response:
+            - 2 MISSING_VERSION The parameter 'version' is missing
+            - 3 MISSING_JSON The parameter 'json_data' is missing
+            - 4 INVALID_JSON The input structure is not a valid JSON string
+            - 5 MISSING_AUTH_USER The parameter 'auth_user' is missing
+            - 6 MISSING_AUTH_PWD The parameter 'auth_pwd' is missing or you are using url login type and it's not allowed on the Configuration file of your iTop
+            - 10 UNSUPPORTED_VERSION No operation is available for the specified version
+            - 11 UNKNOWN_OPERATION The requested operation is not valid for the specified version
+        502:
+          description: |-
+            **Bad Gateway** – Invalid response from the iTop API
+            
+            It occurs when iTop responds with `text/html` instead of `application/json` for some reason. A small part of the original response body will be included in the `message` for debugging, and the `code` will be missing.
+        default:
+          description: |-
+            **Internal Error** – Unexpected error
+
+            Includes next codes from standard response:
+            - 100 INTERNAL_ERROR The operation could not be performed, see the message for troubleshooting
+
+            **NOTE:** the standard API sends a response with this code for many client errors (for example, an incorrect field in `output_fields`, etc.).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+    post:
+      operationId: postObject
+      summary: Create a new object of the class
+      parameters:
+        - name: output_fields
+          description: Mapped to the `output_fields` property in standard json_data.
+          in: query
+          required: false
+          schema:
+            type: string
+            default: id,friendlyname
+            example: title,description,agent_id_friendlyname
+        - name: api_comment
+          description: Mapped to the `comment` property in standard json_data. This overrides the value of the `ITOP_API_COMMENT` environment variable.
+          in: query
+          required: false
+          schema:
+            type: string
+            default: Krakend API Gateway
+      responses:
+components:
+  parameters:
+    objectClassParameter:
+      name: objectClass
+      in: path
+      required: true
+      description: Класс объекта
+      schema:
+        type: string
+        example: UserRequest
+    objectIdParameter:
+      name: objectId
+      in: path
+      required: true
+      description: ID объекта
+      schema:
+        type: number
+        example: 45
+    outputFieldsParameter:
+      name: output_fields
+      description: Mapped to the `output_fields` property in standard json_data.
+      in: query
+      required: false
+      schema:
+        type: string
+        default: id,friendlyname
+        example: ref,title,caller_id_friendlyname
+    limitParameter:
+      name: limit
+      description: Mapped to the `limit` property in standard json_data.
+      in: query
+      required: false
+      schema:
+        type: number
+        format: int
+        default: 100
+    pageParameter:
+      name: page
+      description: Mapped to the `page` property in standard json_data.
+      in: query
+      required: false
+      schema:
+        type: number
+        format: int
+        default: 1
+    whereParameter:
+      name: where
+      description: OQL search condition, mapped to the `key` property in standard json_data. Ignored when using `filter` parameter.
+      in: query
+      required: false
+      schema:
+        type: string
+        example: agent_id = 34 AND start_date > CURRENT_DATE()
+    filterParameter:
+      name: filter
+      description: Full OQL search query, mapped to the `key` property in standard json_data.
+      in: query
+      required: false
+      schema:
+        type: string
+        example: SELECT UserRequest AS ur WHERE ur.agent_id = 34 AND ur.start_date > CURRENT_DATE()
+    apiCommentParameter:
+      name: api_comment
+      description: Mapped to the `comment` property in standard json_data.
+      in: query
+      required: false
+      schema:
+        type: string
+        default: iTop REST API Gateway
+    simulateParameter:
+      name: simulate
+      description: Mapped to the `simulate` property in standard json_data.
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: false
+  schemas:
+    ObjectSchema:
+      type: object
+      properties:
+        code:
+          type: number
+          format: integer
+        message:
+          type: string
+          example: ""
+        class:
+          type: string
+          description: Object class
+          example: UserRequest
+        key:
+          type: number
+          format: integer
+          description: Object ID
+          example: 45
+        fields:
+          type: object
+          description: Object fields specified by `output_fields` parameter
+          example: { "ref": "R-000045", "title": "New desktop for Paul", "caller_id_friendlyname": "Paul McCartney" }
+    ErrorSchema:
+      type: object
+      properties:
+        code:
+          type: number
+          format: integer
+          description: "Error code from standard response (see [docs](https://www.itophub.io/wiki/page?id=latest%3Aadvancedtopics%3Arest_json#error_codes))"
+          example: 100
+        message:
+          type: string
+          example: "Error: output_fields: invalid attribute code 'status'"
+      required: [ message ]

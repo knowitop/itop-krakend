@@ -1,0 +1,82 @@
+{
+  "itop_group": [
+    {
+      "endpoint": "/v1/{objectClass}",
+      "method": "GET",
+      "input_query_strings": [
+        "output_fields",
+        "limit",
+        "page",
+        "where",
+        "filter"
+      ],
+      "backend_req_script": "get_object_list(request.load())",
+      "backend_res_script": "local req = request.load(); handle_list_response(response.load(), req:params('Page'), req:params('Limit'));"
+    },
+    {
+      "endpoint": "/v1/{objectClass}",
+      "method": "POST",
+      "input_query_strings": [
+        "output_fields",
+        "api_comment"
+      ],
+      "backend_req_script": "create_object(request.load())",
+      "backend_res_script": "handle_create_response(response.load())"
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}",
+      "method": "GET",
+      "input_query_strings": [
+        "output_fields"
+      ],
+      "backend_req_script": "get_object_by_id(request.load())",
+      "backend_res_script": "handle_object_response(response.load())"
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}",
+      "method": "PUT",
+      "input_query_strings": [
+        "output_fields",
+        "api_comment"
+      ],
+      "backend_req_script": "update_object_by_id(request.load())",
+      "backend_res_script": "handle_object_response(response.load())"
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}",
+      "method": "DELETE",
+      "input_query_strings": [
+        "api_comment",
+        ""
+      ],
+      "backend_req_script": "delete_object_by_id(request.load())",
+      "backend_res_script": "handle_delete_response(response.load())"
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}/comments/{caseLog}",
+      "method": "GET",
+      "input_query_strings": [],
+      "backend_req_script": "get_case_log_entries(request.load())",
+      "backend_res_script": "local req = request.load(); handle_case_log_response(response.load(), req:params('CaseLog'));"
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}/comments/{caseLog}",
+      "method": "POST",
+      "input_query_strings": [
+        "api_comment"
+      ],
+      "backend_req_script": "add_case_log_entry(request.load())",
+      "backend_res_script": "local req = request.load(); handle_case_log_response(response.load(), req:params('CaseLog'));"
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}/stimulus/{stimulus}",
+      "method": "POST",
+      "input_query_strings": [
+        "output_fields",
+        "api_comment"
+      ],
+      "backend_req_script": "update_object_by_id(request.load(), true)",
+      "backend_res_script": "handle_object_response(response.load())"
+    }
+  ]
+}

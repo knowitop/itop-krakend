@@ -1,0 +1,40 @@
+version: "3.9"
+services:
+
+  apigw:
+    container_name: apigw
+    image: devopsfaith/krakend:${KRAKEND_VERSION:-2.0.6}
+    restart: unless-stopped
+    volumes:
+      - ./krakend:/etc/krakend
+    ports:
+      - "8080:8000"
+    environment:
+      KRAKEND_NAME: iTop REST API Gateway
+      KRAKEND_PORT: 8000
+      USAGE_DISABLE: 1
+      FC_ENABLE: 1
+      FC_PARTIALS: partials
+      FC_SETTINGS: settings
+      FC_TEMPLATES: templates
+      FC_OUT: krakend.out.json
+      ITOP_HOST: http://host.docker.internal:8000
+#      ITOP_AUTH_USER: apigw
+#      ITOP_AUTH_PWD: apigw
+      # basic|url (todo)
+#      ITOP_AUTH_MODE: basic
+      ITOP_API_COMMENT: iTop Proxy API
+      # LUA_LIVE_RELOAD: 1
+    command: run -c krakend.json.tmpl
+
+#  itop:
+#    image: vbkunin/itop:${ITOP_VERSION:-3.0.0}
+#    ports:
+#      - "8000:80"
+#    volumes:
+#      - db-volume:/var/lib/mysql
+#    environment:
+#      MYSQL_PASS: '123456'
+
+#volumes:
+#  db-volume:

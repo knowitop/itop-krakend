@@ -1,0 +1,52 @@
+{
+  "$schema": "https://www.krakend.io/schema/v3.json",
+  "version": 3,
+  "name": "iTop REST API Gateway",
+  "port": 8000,
+  "cache_ttl": "300s",
+  "timeout": "3s",
+  "extra_config": {
+    "security/cors": {
+      "allow_origins": [
+        "*"
+      ],
+      "expose_headers": [
+        "Content-Length"
+      ],
+      "max_age": "12h",
+      "allow_methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "allow_headers": [
+        {{ if not (env "ITOP_AUTH_MODE") }}"Authorization",{{end}}
+        "Origin",
+        "Content-Type"
+      ],
+      "allow_credentials": true
+    },
+    "telemetry/logging": {
+      "level": "DEBUG",
+      "prefix": "[KRAKEND]",
+      "syslog": false,
+      "stdout": true,
+      "format": "default"
+    },
+    "telemetry/logstash": {
+      "enabled": false
+    }
+  },
+  "host": [
+    "{{ env "ITOP_HOST" | nospace | splitList "," | join `", "` }}"
+  ],
+  "endpoints": [
+    {{ range $idx, $endpoint := .endpoints.itop_group }}
+    {{ if $idx }},{{ end }}
+      {{ template "itop_endpoint.tmpl" $endpoint }}
+    {{ end }}
+  ],
+  "output_encoding": "json",
+  "disable_rest": true
+}

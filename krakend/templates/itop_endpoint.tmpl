@@ -1,0 +1,33 @@
+{
+    "endpoint": "{{ .endpoint }}",
+    "method": "{{ .method }}",
+    "output_encoding": "no-op",
+    "input_query_strings": {{ marshal .input_query_strings }},
+    {{ if not (env "ITOP_AUTH_MODE") }}"input_headers": ["Authorization"],{{end}}
+    "backend": [
+        {
+            "url_pattern": "/webservices/rest.php?version=1.4",
+            "sd": "static",
+            "method": "POST",
+            "disable_host_sanitize": false,
+            "extra_config":{
+            {{ if eq (env "ITOP_AUTH_MODE") "basic" }}
+                "modifier/martian": {
+                    "header.Modifier": {
+                        "scope": ["request"],
+                        "name": "Authorization",
+                        "value": "Basic {{ printf `%v:%v` (env "ITOP_AUTH_USER") (env "ITOP_AUTH_PWD") | b64enc }}"
+                    }
+                },
+            {{end}}
+                "modifier/lua-backend": {
+                    "allow_open_libs": true,
+                    {{if (env "LUA_LIVE_RELOAD") }}"live": true,{{end}}
+                    "sources": ["lua/script.lua"],
+                    "pre": "{{ .backend_req_script }}",
+                    "post": "{{ .backend_res_script }}"
+                }
+            }
+        }
+    ]
+}
