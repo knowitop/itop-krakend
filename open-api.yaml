@@ -1,55 +1,22 @@
 openapi: 3.0.3
 info:
   title: iTop REST API Gateway
-  version: 1.0.0
+  version: 0.1.0
 servers:
   - url: http://localhost:8080
 paths:
   /v1/{objectClass}:
     parameters:
-      - $ref: '#/components/parameters/objectClassParameter'
+      - $ref: '#/components/parameters/ObjectClassParameter'
     get:
       operationId: getObjectList
       summary: Get a list of objects of the class
       parameters:
-        - name: output_fields
-          description: Mapped to the `output_fields` property in standard json_data.
-          in: query
-          required: false
-          schema:
-            type: string
-            default: id,friendlyname
-            example: title,description,agent_id_friendlyname
-        - name: limit
-          description: Mapped to the `limit` property in standard json_data.
-          in: query
-          required: false
-          schema:
-            type: number
-            format: int
-            default: 100
-        - name: page
-          description: Mapped to the `page` property in standard json_data.
-          in: query
-          required: false
-          schema:
-            type: number
-            format: int
-            default: 1
-        - name: where
-          description: OQL search condition, mapped to the `key` property in standard json_data.
-          in: query
-          required: false
-          schema:
-            type: string
-            example: agent_id = 34 AND start_date > CURRENT_DATE()
-        - name: filter
-          description: Full OQL search query, mapped to the `key` property in standard json_data.
-          in: query
-          required: false
-          schema:
-            type: string
-            example: SELECT UserRequest AS ur WHERE ur.agent_id = 34 AND ur.start_date > CURRENT_DATE()
+        - $ref: '#/components/parameters/OutputFieldsParameter'
+        - $ref: '#/components/parameters/LimitParameter'
+        - $ref: '#/components/parameters/PageParameter'
+        - $ref: '#/components/parameters/WhereParameter'
+        - $ref: '#/components/parameters/FilterParameter'
       responses:
         200:
           description: List of objects with pagination
@@ -61,7 +28,7 @@ paths:
                   objects:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ObjectSchema'
+                      $ref: '#/components/schemas/ObjectWithFieldsSchema'
                   code:
                     type: number
                     format: integer
@@ -92,106 +59,241 @@ paths:
                         description: Total objects
                         example: 11
         400:
-          description: |-
-            **Bad Request** – Invalid request parameters or body
-            
-            Includes next codes from standard response:
-            - 13 INVALID_PAGE The request page number is not valid. It must be an integer greater than 0
+          $ref: '#/components/responses/Error400'
         401:
-          description: |-
-            **Unauthorized** – Authentication failed
-            
-            When this occurs, iTop sends `text/html` page instead of `application/json` in response to a request with incorrect credentials. A part of the original response body will be included in the `message` for debugging, and the `code` will be missing.
+          $ref: '#/components/responses/Error401'
         403:
-          description: |-
-            **Forbidden** – User does not have enough rights to perform the request
-            
-            Includes next codes from standard response:
-              - 1 UNAUTHORIZED Missing/wrong credentials or the user does not have enough rights to perform the requested operation
-        404:
-          description: |- 
-            **Not Found** – Requested URL is invalid or object with the ID not exist.
+          $ref: '#/components/responses/Error403'
         422:
-          description: |-
-            **Unprocessable Entity** – the request is syntactically correct, but for some reason cannot be processed.
-            
-            Includes next codes from standard response:
-            - 12 UNSAFE The requested operation cannot be performed because it can cause data (integrity) loss
-            - 100 INTERNAL_ERROR The operation could not be performed, see the message for troubleshooting
-              
-              Code 100 with next messages:
-              - *Error: {att_code}: No item found with criteria ...* – When trying to set a non-existent object as a property value using JSON
-              - `Error: {att_code}: Invalid object ...` – When trying to set a non-existent object as a property value using Id
-              - `Missing mandatory attribute(s) for applying the stimulus ...`
-              - `Invalid stimulus: '{stimulus}' on the object ...`
-              - `Error: Found issue(s): target_class = {class}, target_id = {id} ...` – When deletion plan required manual operations
+          $ref: '#/components/responses/Error422'
         500:
-          description: |-
-          
-            Includes next codes from standard response:
-            - 2 MISSING_VERSION The parameter 'version' is missing
-            - 3 MISSING_JSON The parameter 'json_data' is missing
-            - 4 INVALID_JSON The input structure is not a valid JSON string
-            - 5 MISSING_AUTH_USER The parameter 'auth_user' is missing
-            - 6 MISSING_AUTH_PWD The parameter 'auth_pwd' is missing or you are using url login type and it's not allowed on the Configuration file of your iTop
-            - 10 UNSUPPORTED_VERSION No operation is available for the specified version
-            - 11 UNKNOWN_OPERATION The requested operation is not valid for the specified version
+          $ref: '#/components/responses/Error500'
         502:
-          description: |-
-            **Bad Gateway** – Invalid response from the iTop API
-            
-            It occurs when iTop responds with `text/html` instead of `application/json` for some reason. A small part of the original response body will be included in the `message` for debugging, and the `code` will be missing.
+          $ref: '#/components/responses/Error502'
         default:
-          description: |-
-            **Internal Error** – Unexpected error
-
-            Includes next codes from standard response:
-            - 100 INTERNAL_ERROR The operation could not be performed, see the message for troubleshooting
-
-            **NOTE:** the standard API sends a response with this code for many client errors (for example, an incorrect field in `output_fields`, etc.).
+          $ref: '#/components/responses/ErrorDefault'
+    post:
+      operationId: createObject
+      summary: Create a new object of the class
+      parameters:
+        - $ref: '#/components/parameters/OutputFieldsParameter'
+        - $ref: '#/components/parameters/ApiCommentParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Object fields with values to create a new object
+              example: { "org_id": 1, "title": "New user request", "description": "Request description" }
+      responses:
+        201:
+          description: Created object
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorSchema'
-    post:
-      operationId: postObject
-      summary: Create a new object of the class
-      parameters:
-        - name: output_fields
-          description: Mapped to the `output_fields` property in standard json_data.
-          in: query
-          required: false
-          schema:
-            type: string
-            default: id,friendlyname
-            example: title,description,agent_id_friendlyname
-        - name: api_comment
-          description: Mapped to the `comment` property in standard json_data. This overrides the value of the `ITOP_API_COMMENT` environment variable.
-          in: query
-          required: false
-          schema:
-            type: string
-            default: Krakend API Gateway
+                $ref: '#/components/schemas/ObjectWithFieldsSchema'
+        400:
+          $ref: '#/components/responses/Error400'
+        401:
+          $ref: '#/components/responses/Error401'
+        403:
+          $ref: '#/components/responses/Error403'
+        422:
+          $ref: '#/components/responses/Error422'
+        500:
+          $ref: '#/components/responses/Error500'
+        502:
+          $ref: '#/components/responses/Error502'
+        default:
+          $ref: '#/components/responses/ErrorDefault'
+  /v1/{objectClass}/{objectId}:
+    parameters:
+      - $ref: '#/components/parameters/ObjectClassParameter'
+      - $ref: '#/components/parameters/ObjectIdParameter'
+      - $ref: '#/components/parameters/OutputFieldsParameter'
+    get:
+      operationId: getObject
+      summary: Get an object
       responses:
+        200:
+          description: Requested object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectWithFieldsSchema'
+        401:
+          $ref: '#/components/responses/Error401'
+        403:
+          $ref: '#/components/responses/Error403'
+        404:
+          $ref: '#/components/responses/Error404'
+        500:
+          $ref: '#/components/responses/Error500'
+        502:
+          $ref: '#/components/responses/Error502'
+        default:
+          $ref: '#/components/responses/ErrorDefault'
+    put:
+      operationId: updateObject
+      summary: Update an object
+      parameters:
+        - $ref: '#/components/parameters/ApiCommentParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Object fields with values to update
+              example: { "title": "New desktop for Paul", "service_id": 12, "servicesubcategory_id": 45 }
+      responses:
+        200:
+          description: Updated object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectWithFieldsSchema'
+        400:
+          $ref: '#/components/responses/Error400'
+        401:
+          $ref: '#/components/responses/Error401'
+        403:
+          $ref: '#/components/responses/Error403'
+        404:
+          $ref: '#/components/responses/Error404'
+        422:
+          $ref: '#/components/responses/Error422'
+        500:
+          $ref: '#/components/responses/Error500'
+        502:
+          $ref: '#/components/responses/Error502'
+        default:
+          $ref: '#/components/responses/ErrorDefault'
+    delete:
+      operationId: deleteObject
+      summary: Delete an object
+      description: Delete an object and its associated dependent objects that are available for auto-deletion
+      parameters:
+        - $ref: '#/components/parameters/ApiCommentParameter'
+        - $ref: '#/components/parameters/SimulateParameter'
+      responses:
+        200:
+          description: Deleted and updated objects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  objects:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ObjectWithFieldsSchema'
+                  code:
+                    type: number
+                    format: integer
+                  message:
+                    type: string
+                    example: "SIMULATING: Deleted: 1 plus (for DB integrity) 5"
+        401:
+          $ref: '#/components/responses/Error401'
+        403:
+          $ref: '#/components/responses/Error403'
+        404:
+          $ref: '#/components/responses/Error404'
+        422:
+          $ref: '#/components/responses/Error422'
+        500:
+          $ref: '#/components/responses/Error500'
+        502:
+          $ref: '#/components/responses/Error502'
+        default:
+          $ref: '#/components/responses/ErrorDefault'
+  /v1/{objectClass}/{objectId}/comments/{caseLog}:
+    parameters:
+      - $ref: '#/components/parameters/ObjectClassParameter'
+      - $ref: '#/components/parameters/ObjectIdParameter'
+      - $ref: '#/components/parameters/CaseLogParameter'
+    get:
+      operationId: getObjectCaseLogEntries
+      summary: Get object case log entries
+      responses:
+        200:
+          description: Requested case log content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectWithCaseLogSchema'
+        401:
+          $ref: '#/components/responses/Error401'
+        403:
+          $ref: '#/components/responses/Error403'
+        404:
+          $ref: '#/components/responses/Error404'
+        500:
+          $ref: '#/components/responses/Error500'
+        502:
+          $ref: '#/components/responses/Error502'
+        default:
+          $ref: '#/components/responses/ErrorDefault'
+    post:
+      operationId: addObjectCaseLogEntry
+      summary: Add a new case log entry
+      parameters:
+        - $ref: '#/components/parameters/ApiCommentParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CaseLogSchema'
+      responses:
+        200:
+          description: Updated case log content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectWithCaseLogSchema'
+        400:
+          $ref: '#/components/responses/Error400'
+        401:
+          $ref: '#/components/responses/Error401'
+        403:
+          $ref: '#/components/responses/Error403'
+        404:
+          $ref: '#/components/responses/Error404'
+        422:
+          $ref: '#/components/responses/Error422'
+        500:
+          $ref: '#/components/responses/Error500'
+        502:
+          $ref: '#/components/responses/Error502'
+        default:
+          $ref: '#/components/responses/ErrorDefault'
 components:
   parameters:
-    objectClassParameter:
+    ObjectClassParameter:
       name: objectClass
       in: path
       required: true
-      description: Класс объекта
+      description: Object class
       schema:
         type: string
         example: UserRequest
-    objectIdParameter:
+    ObjectIdParameter:
       name: objectId
       in: path
       required: true
-      description: ID объекта
+      description: Object ID
       schema:
         type: number
         example: 45
-    outputFieldsParameter:
+    CaseLogParameter:
+      name: caseLog
+      in: path
+      required: true
+      description: Case log attribute name
+      schema:
+        type: string
+        example: public_log
+    OutputFieldsParameter:
       name: output_fields
       description: Mapped to the `output_fields` property in standard json_data.
       in: query
@@ -200,7 +302,7 @@ components:
         type: string
         default: id,friendlyname
         example: ref,title,caller_id_friendlyname
-    limitParameter:
+    LimitParameter:
       name: limit
       description: Mapped to the `limit` property in standard json_data.
       in: query
@@ -209,7 +311,7 @@ components:
         type: number
         format: int
         default: 100
-    pageParameter:
+    PageParameter:
       name: page
       description: Mapped to the `page` property in standard json_data.
       in: query
@@ -218,7 +320,7 @@ components:
         type: number
         format: int
         default: 1
-    whereParameter:
+    WhereParameter:
       name: where
       description: OQL search condition, mapped to the `key` property in standard json_data. Ignored when using `filter` parameter.
       in: query
@@ -226,7 +328,7 @@ components:
       schema:
         type: string
         example: agent_id = 34 AND start_date > CURRENT_DATE()
-    filterParameter:
+    FilterParameter:
       name: filter
       description: Full OQL search query, mapped to the `key` property in standard json_data.
       in: query
@@ -234,15 +336,15 @@ components:
       schema:
         type: string
         example: SELECT UserRequest AS ur WHERE ur.agent_id = 34 AND ur.start_date > CURRENT_DATE()
-    apiCommentParameter:
+    ApiCommentParameter:
       name: api_comment
-      description: Mapped to the `comment` property in standard json_data.
+      description: Mapped to the `comment` property in standard json_data. This overrides the value of the `ITOP_API_COMMENT` environment variable.
       in: query
       required: false
       schema:
         type: string
         default: iTop REST API Gateway
-    simulateParameter:
+    SimulateParameter:
       name: simulate
       description: Mapped to the `simulate` property in standard json_data.
       in: query
@@ -251,7 +353,7 @@ components:
         type: boolean
         default: false
   schemas:
-    ObjectSchema:
+    ObjectBaseSchema:
       type: object
       properties:
         code:
@@ -259,6 +361,7 @@ components:
           format: integer
         message:
           type: string
+          description: "Standard iTop API message for the object (created, updated, Reset external keys: Agent, etc.)"
           example: ""
         class:
           type: string
@@ -269,10 +372,77 @@ components:
           format: integer
           description: Object ID
           example: 45
-        fields:
-          type: object
-          description: Object fields specified by `output_fields` parameter
-          example: { "ref": "R-000045", "title": "New desktop for Paul", "caller_id_friendlyname": "Paul McCartney" }
+    ObjectWithFieldsSchema:
+      allOf:
+        - $ref: '#/components/schemas/ObjectBaseSchema'
+        - type: object
+          properties:
+            fields:
+              type: object
+              description: Object fields specified by `output_fields` parameter
+              example: { "ref": "R-000045", "title": "New desktop for Paul", "caller_id_friendlyname": "Paul McCartney" }
+    ObjectWithCaseLogSchema:
+      allOf:
+        - $ref: '#/components/schemas/ObjectBaseSchema'
+        - type: object
+          properties:
+            case_log:
+              type: string
+              description: Case log name
+              example: public_log
+            entries:
+              type: array
+              description: Case log entries
+              items:
+                $ref: '#/components/schemas/CaseLogSchema'
+              example: [
+                {
+                  "date": "2022-12-11 14:21:04",
+                  "user_login": "martina",
+                  "user_id": "20",
+                  "message": "Help!",
+                  "message_html": "<p>Help!</p>"
+                },
+                {
+                  "date": "2022-12-11 14:27:35",
+                  "user_login": "admin",
+                  "user_id": "1",
+                  "message": "From backend with love!",
+                  "message_html": "<p>From backend with love!</p>"
+                }
+              ]
+    CaseLogSchema:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Date and time in the format `YYYY-MM-DD hh:mm:ss` (current date by default)
+          format: date-time
+          example: 2022-12-11 14:21:04
+        user_login:
+          type: string
+          example: martina
+          readOnly: true
+        user_id:
+          type: string
+          description: Entry author user ID (by default, the credentials used for the request), can only be set by users with the `Administrator` profile
+          example: 20
+        message:
+          type: string
+          example: Hello REST API
+        message_html:
+          type: string
+          example: <p>Hello REST API</p>
+          readOnly: true
+        format:
+          type: string
+          enum:
+            - text
+            - html
+          default: text
+          writeOnly: true
+      required:
+        - message
     ErrorSchema:
       type: object
       properties:
@@ -285,3 +455,67 @@ components:
           type: string
           example: "Error: output_fields: invalid attribute code 'status'"
       required: [ message ]
+  responses:
+    Error400:
+      description: |-
+        **Bad Request** – invalid request parameters or body.
+        
+        Includes next codes from standard response:
+        - 13 INVALID_PAGE The request page number is not valid. It must be an integer greater than 0
+    Error401:
+      description: |-
+        **Unauthorized** – user authentication failed.
+        
+        When this occurs, iTop sends `text/html` page instead of `application/json` in response to a request with incorrect credentials. A part of the original response body will be included in the `message` for debugging, and the `code` will be missing.
+    Error403:
+      description: |-
+        **Forbidden** – user does not have enough rights to perform the request.
+        
+        Includes next codes from standard response:
+          - 1 UNAUTHORIZED Missing/wrong credentials or the user does not have enough rights to perform the requested operation
+    Error404:
+      description: |-
+        **Not Found** – requested URL is invalid or object with the ID not exist.
+    Error422:
+      description: |-
+        **Unprocessable Entity** – the request is syntactically correct, but for some reason cannot be processed.
+        
+        Includes next codes from standard response:
+        - 12 UNSAFE The requested operation cannot be performed because it can cause data (integrity) loss
+        - 100 INTERNAL_ERROR The operation could not be performed, see the message for troubleshooting
+        
+          Code 100 with next messages:
+          - `Error: {att_code}: No item found with criteria ...` – When trying to set a non-existent object as a property value using JSON
+          - `Error: {att_code}: Invalid object ...` – When trying to set a non-existent object as a property value using Id
+          - `Missing mandatory attribute(s) for applying the stimulus ...`
+          - `Invalid stimulus: '{stimulus}' on the object ...`
+          - `Error: Found issue(s): target_class = {class}, target_id = {id} ...` – When deletion plan required manual operations
+    Error500:
+      description: |-
+        **Internal Server Error** – iTop internal error or errors in the gateway's area of responsibility.
+        
+        Includes next codes from standard response:
+        - 2 MISSING_VERSION The parameter 'version' is missing
+        - 3 MISSING_JSON The parameter 'json_data' is missing
+        - 4 INVALID_JSON The input structure is not a valid JSON string
+        - 5 MISSING_AUTH_USER The parameter 'auth_user' is missing
+        - 6 MISSING_AUTH_PWD The parameter 'auth_pwd' is missing or you are using url login type and it's not allowed on the Configuration file of your iTop
+        - 10 UNSUPPORTED_VERSION No operation is available for the specified version
+        - 11 UNKNOWN_OPERATION The requested operation is not valid for the specified version
+    Error502:
+      description: |-
+        **Bad Gateway** – invalid response from the iTop API.
+        
+        It occurs when iTop responds with `text/html` instead of `application/json` for some reason. A small part of the original response body will be included in the `message` for debugging, and the `code` will be missing.
+    ErrorDefault:
+      description: |-
+        **Internal Error** – unexpected error.
+        
+        Includes next codes from standard response:
+        - 100 INTERNAL_ERROR The operation could not be performed, see the message for troubleshooting
+        
+        **NOTE:** the standard API sends a response with this code for many client errors (for example, an incorrect field in `output_fields`, etc.).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorSchema'
