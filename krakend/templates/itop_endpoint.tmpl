@@ -3,27 +3,59 @@
     "method": "{{ .method }}",
     "output_encoding": "no-op",
     "input_query_strings": {{ marshal .input_query_strings }},
-    {{ if not (env "ITOP_AUTH_MODE") }}"input_headers": ["Authorization"],{{end}}
+    "input_headers": [
+        {{ if empty (env "ITOP_AUTH_MODE" | trim) }}
+            "Authorization"
+            {{ if eq (env "COOKIE_PASS") "1" }}
+                , "Cookie"
+            {{ end }}
+        {{ end }}
+    ],
     "backend": [
         {
-            "url_pattern": "/webservices/rest.php?version=1.4",
+            "url_pattern": "{{ env "ITOP_BASE_PATH" }}/webservices/rest.php?version=1.4",
             "sd": "static",
             "method": "POST",
             "disable_host_sanitize": false,
-            "extra_config":{
-            {{ if eq (env "ITOP_AUTH_MODE") "basic" }}
+            "encoding": "no-op",
+            "extra_config": {
                 "modifier/martian": {
-                    "header.Modifier": {
-                        "scope": ["request"],
-                        "name": "Authorization",
-                        "value": "Basic {{ printf `%v:%v` (env "ITOP_AUTH_USER") (env "ITOP_AUTH_PWD") | b64enc }}"
+                    "fifo.Group": {
+                        "scope": ["request", "response"],
+                        "modifiers": [
+                            {{ if eq (env "ITOP_AUTH_MODE" | trim) "basic" }}
+                                {
+                                    "header.Modifier": {
+                                        "scope": ["request"],
+                                        "name": "Authorization",
+                                        "value": "Basic {{ printf `%v:%v` (env "ITOP_AUTH_USER" | trim) (env "ITOP_AUTH_PWD" | trim) | b64enc }}"
+                                    }
+                                },
+                                {
+                                    "header.Blacklist": {
+                                        "scope": ["request", "response"],
+                                        "names": ["Cookie", "Set-Cookie"]
+                                    }
+                                }
+                            {{ else if ne (env "COOKIE_PASS") "1" }}
+                                {
+                                    "header.Blacklist": {
+                                        "scope": ["request", "response"],
+                                        "names": ["Cookie", "Set-Cookie"]
+                                    }
+                                }
+                            {{ end }}
+                        ]
                     }
                 },
-            {{end}}
                 "modifier/lua-backend": {
                     "allow_open_libs": true,
-                    {{if (env "LUA_LIVE_RELOAD") }}"live": true,{{end}}
-                    "sources": ["lua/script.lua"],
+                    {{if eq (env "LUA_LIVE_RELOAD") "1" }}"live": true,{{end}}
+                    "sources": ["lua/script.lua", "lua/rxi-json.lua"],
+                    "md5": {
+                        "lua/script.lua": "302f96876407a0018ccd627f76db121f",
+                        "lua/rxi-json.lua": "99e51c5cdcfb9bd2bca4562a77397cfa"
+                    },
                     "pre": "{{ .backend_req_script }}",
                     "post": "{{ .backend_res_script }}"
                 }

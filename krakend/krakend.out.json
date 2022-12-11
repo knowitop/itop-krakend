@@ -39,226 +39,471 @@
     }
   },
   "host": [
-    "http://host.docker.internal:8000"
+    "https://demo.knowitop.ru"
   ],
   "endpoints": [
-    
-    
-      {
-    "endpoint": "/v1/{objectClass}",
-    "method": "GET",
-    "output_encoding": "no-op",
-    "input_query_strings": ["output_fields","limit","page","where","filter"],
-    "input_headers": ["Authorization"],
-    "backend": [
+    {
+      "endpoint": "/v1/{objectClass}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": [
+        "output_fields",
+        "limit",
+        "page",
+        "where",
+        "filter"
+      ],
+      "input_headers": [
+        "Authorization"
+      ],
+      "backend": [
         {
-            "url_pattern": "/webservices/rest.php?version=1.4",
-            "sd": "static",
-            "method": "POST",
-            "disable_host_sanitize": false,
-            "extra_config":{
-            
-                "modifier/lua-backend": {
-                    "allow_open_libs": true,
-                    
-                    "sources": ["lua/script.lua"],
-                    "pre": "get_object_list(request.load())",
-                    "post": "local req = request.load(); handle_list_response(response.load(), req:params('Page'), req:params('Limit'));"
-                }
+          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "sd": "static",
+          "method": "POST",
+          "disable_host_sanitize": false,
+          "encoding": "no-op",
+          "extra_config": {
+            "modifier/martian": {
+              "fifo.Group": {
+                "scope": [
+                  "request",
+                  "response"
+                ],
+                "modifiers": [
+                  {
+                    "header.Blacklist": {
+                      "scope": [
+                        "request",
+                        "response"
+                      ],
+                      "names": [
+                        "Cookie",
+                        "Set-Cookie"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "modifier/lua-backend": {
+              "allow_open_libs": true,
+              "sources": [
+                "lua/script.lua",
+                "lua/rxi-json.lua"
+              ],
+              "md5": {
+                "lua/script.lua": "302f96876407a0018ccd627f76db121f",
+                "lua/rxi-json.lua": "99e51c5cdcfb9bd2bca4562a77397cfa"
+              },
+              "pre": "get_object_list(request.load())",
+              "post": "local req = request.load(); handle_list_response(response.load(), req:params('Page'), req:params('Limit'));"
             }
+          }
         }
-    ]
-}
-    
-    ,
-      {
-    "endpoint": "/v1/{objectClass}",
-    "method": "POST",
-    "output_encoding": "no-op",
-    "input_query_strings": ["output_fields","api_comment"],
-    "input_headers": ["Authorization"],
-    "backend": [
+      ]
+    },
+    {
+      "endpoint": "/v1/{objectClass}",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_query_strings": [
+        "output_fields",
+        "api_comment"
+      ],
+      "input_headers": [
+        "Authorization"
+      ],
+      "backend": [
         {
-            "url_pattern": "/webservices/rest.php?version=1.4",
-            "sd": "static",
-            "method": "POST",
-            "disable_host_sanitize": false,
-            "extra_config":{
-            
-                "modifier/lua-backend": {
-                    "allow_open_libs": true,
-                    
-                    "sources": ["lua/script.lua"],
-                    "pre": "create_object(request.load())",
-                    "post": "handle_create_response(response.load())"
-                }
+          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "sd": "static",
+          "method": "POST",
+          "disable_host_sanitize": false,
+          "encoding": "no-op",
+          "extra_config": {
+            "modifier/martian": {
+              "fifo.Group": {
+                "scope": [
+                  "request",
+                  "response"
+                ],
+                "modifiers": [
+                  {
+                    "header.Blacklist": {
+                      "scope": [
+                        "request",
+                        "response"
+                      ],
+                      "names": [
+                        "Cookie",
+                        "Set-Cookie"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "modifier/lua-backend": {
+              "allow_open_libs": true,
+              "sources": [
+                "lua/script.lua",
+                "lua/rxi-json.lua"
+              ],
+              "md5": {
+                "lua/script.lua": "302f96876407a0018ccd627f76db121f",
+                "lua/rxi-json.lua": "99e51c5cdcfb9bd2bca4562a77397cfa"
+              },
+              "pre": "create_object(request.load())",
+              "post": "handle_create_response(response.load())"
             }
+          }
         }
-    ]
-}
-    
-    ,
-      {
-    "endpoint": "/v1/{objectClass}/{objectId}",
-    "method": "GET",
-    "output_encoding": "no-op",
-    "input_query_strings": ["output_fields"],
-    "input_headers": ["Authorization"],
-    "backend": [
+      ]
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": [
+        "output_fields"
+      ],
+      "input_headers": [
+        "Authorization"
+      ],
+      "backend": [
         {
-            "url_pattern": "/webservices/rest.php?version=1.4",
-            "sd": "static",
-            "method": "POST",
-            "disable_host_sanitize": false,
-            "extra_config":{
-            
-                "modifier/lua-backend": {
-                    "allow_open_libs": true,
-                    
-                    "sources": ["lua/script.lua"],
-                    "pre": "get_object_by_id(request.load())",
-                    "post": "handle_object_response(response.load())"
-                }
+          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "sd": "static",
+          "method": "POST",
+          "disable_host_sanitize": false,
+          "encoding": "no-op",
+          "extra_config": {
+            "modifier/martian": {
+              "fifo.Group": {
+                "scope": [
+                  "request",
+                  "response"
+                ],
+                "modifiers": [
+                  {
+                    "header.Blacklist": {
+                      "scope": [
+                        "request",
+                        "response"
+                      ],
+                      "names": [
+                        "Cookie",
+                        "Set-Cookie"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "modifier/lua-backend": {
+              "allow_open_libs": true,
+              "sources": [
+                "lua/script.lua",
+                "lua/rxi-json.lua"
+              ],
+              "md5": {
+                "lua/script.lua": "302f96876407a0018ccd627f76db121f",
+                "lua/rxi-json.lua": "99e51c5cdcfb9bd2bca4562a77397cfa"
+              },
+              "pre": "get_object_by_id(request.load())",
+              "post": "handle_object_response(response.load())"
             }
+          }
         }
-    ]
-}
-    
-    ,
-      {
-    "endpoint": "/v1/{objectClass}/{objectId}",
-    "method": "PUT",
-    "output_encoding": "no-op",
-    "input_query_strings": ["output_fields","api_comment"],
-    "input_headers": ["Authorization"],
-    "backend": [
+      ]
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}",
+      "method": "PUT",
+      "output_encoding": "no-op",
+      "input_query_strings": [
+        "output_fields",
+        "api_comment"
+      ],
+      "input_headers": [
+        "Authorization"
+      ],
+      "backend": [
         {
-            "url_pattern": "/webservices/rest.php?version=1.4",
-            "sd": "static",
-            "method": "POST",
-            "disable_host_sanitize": false,
-            "extra_config":{
-            
-                "modifier/lua-backend": {
-                    "allow_open_libs": true,
-                    
-                    "sources": ["lua/script.lua"],
-                    "pre": "update_object_by_id(request.load())",
-                    "post": "handle_object_response(response.load())"
-                }
+          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "sd": "static",
+          "method": "POST",
+          "disable_host_sanitize": false,
+          "encoding": "no-op",
+          "extra_config": {
+            "modifier/martian": {
+              "fifo.Group": {
+                "scope": [
+                  "request",
+                  "response"
+                ],
+                "modifiers": [
+                  {
+                    "header.Blacklist": {
+                      "scope": [
+                        "request",
+                        "response"
+                      ],
+                      "names": [
+                        "Cookie",
+                        "Set-Cookie"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "modifier/lua-backend": {
+              "allow_open_libs": true,
+              "sources": [
+                "lua/script.lua",
+                "lua/rxi-json.lua"
+              ],
+              "md5": {
+                "lua/script.lua": "302f96876407a0018ccd627f76db121f",
+                "lua/rxi-json.lua": "99e51c5cdcfb9bd2bca4562a77397cfa"
+              },
+              "pre": "update_object_by_id(request.load())",
+              "post": "handle_object_response(response.load())"
             }
+          }
         }
-    ]
-}
-    
-    ,
-      {
-    "endpoint": "/v1/{objectClass}/{objectId}",
-    "method": "DELETE",
-    "output_encoding": "no-op",
-    "input_query_strings": ["api_comment",""],
-    "input_headers": ["Authorization"],
-    "backend": [
+      ]
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}",
+      "method": "DELETE",
+      "output_encoding": "no-op",
+      "input_query_strings": [
+        "api_comment",
+        "simulate"
+      ],
+      "input_headers": [
+        "Authorization"
+      ],
+      "backend": [
         {
-            "url_pattern": "/webservices/rest.php?version=1.4",
-            "sd": "static",
-            "method": "POST",
-            "disable_host_sanitize": false,
-            "extra_config":{
-            
-                "modifier/lua-backend": {
-                    "allow_open_libs": true,
-                    
-                    "sources": ["lua/script.lua"],
-                    "pre": "delete_object_by_id(request.load())",
-                    "post": "handle_delete_response(response.load())"
-                }
+          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "sd": "static",
+          "method": "POST",
+          "disable_host_sanitize": false,
+          "encoding": "no-op",
+          "extra_config": {
+            "modifier/martian": {
+              "fifo.Group": {
+                "scope": [
+                  "request",
+                  "response"
+                ],
+                "modifiers": [
+                  {
+                    "header.Blacklist": {
+                      "scope": [
+                        "request",
+                        "response"
+                      ],
+                      "names": [
+                        "Cookie",
+                        "Set-Cookie"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "modifier/lua-backend": {
+              "allow_open_libs": true,
+              "sources": [
+                "lua/script.lua",
+                "lua/rxi-json.lua"
+              ],
+              "md5": {
+                "lua/script.lua": "302f96876407a0018ccd627f76db121f",
+                "lua/rxi-json.lua": "99e51c5cdcfb9bd2bca4562a77397cfa"
+              },
+              "pre": "delete_object_by_id(request.load())",
+              "post": "handle_delete_response(response.load())"
             }
+          }
         }
-    ]
-}
-    
-    ,
-      {
-    "endpoint": "/v1/{objectClass}/{objectId}/comments/{caseLog}",
-    "method": "GET",
-    "output_encoding": "no-op",
-    "input_query_strings": [],
-    "input_headers": ["Authorization"],
-    "backend": [
+      ]
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}/comments/{caseLog}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": [],
+      "input_headers": [
+        "Authorization"
+      ],
+      "backend": [
         {
-            "url_pattern": "/webservices/rest.php?version=1.4",
-            "sd": "static",
-            "method": "POST",
-            "disable_host_sanitize": false,
-            "extra_config":{
-            
-                "modifier/lua-backend": {
-                    "allow_open_libs": true,
-                    
-                    "sources": ["lua/script.lua"],
-                    "pre": "get_case_log_entries(request.load())",
-                    "post": "local req = request.load(); handle_case_log_response(response.load(), req:params('CaseLog'));"
-                }
+          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "sd": "static",
+          "method": "POST",
+          "disable_host_sanitize": false,
+          "encoding": "no-op",
+          "extra_config": {
+            "modifier/martian": {
+              "fifo.Group": {
+                "scope": [
+                  "request",
+                  "response"
+                ],
+                "modifiers": [
+                  {
+                    "header.Blacklist": {
+                      "scope": [
+                        "request",
+                        "response"
+                      ],
+                      "names": [
+                        "Cookie",
+                        "Set-Cookie"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "modifier/lua-backend": {
+              "allow_open_libs": true,
+              "sources": [
+                "lua/script.lua",
+                "lua/rxi-json.lua"
+              ],
+              "md5": {
+                "lua/script.lua": "302f96876407a0018ccd627f76db121f",
+                "lua/rxi-json.lua": "99e51c5cdcfb9bd2bca4562a77397cfa"
+              },
+              "pre": "get_case_log_entries(request.load())",
+              "post": "local req = request.load(); handle_case_log_response(response.load(), req:params('CaseLog'));"
             }
+          }
         }
-    ]
-}
-    
-    ,
-      {
-    "endpoint": "/v1/{objectClass}/{objectId}/comments/{caseLog}",
-    "method": "POST",
-    "output_encoding": "no-op",
-    "input_query_strings": ["api_comment"],
-    "input_headers": ["Authorization"],
-    "backend": [
+      ]
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}/comments/{caseLog}",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_query_strings": [
+        "api_comment"
+      ],
+      "input_headers": [
+        "Authorization"
+      ],
+      "backend": [
         {
-            "url_pattern": "/webservices/rest.php?version=1.4",
-            "sd": "static",
-            "method": "POST",
-            "disable_host_sanitize": false,
-            "extra_config":{
-            
-                "modifier/lua-backend": {
-                    "allow_open_libs": true,
-                    
-                    "sources": ["lua/script.lua"],
-                    "pre": "add_case_log_entry(request.load())",
-                    "post": "local req = request.load(); handle_case_log_response(response.load(), req:params('CaseLog'));"
-                }
+          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "sd": "static",
+          "method": "POST",
+          "disable_host_sanitize": false,
+          "encoding": "no-op",
+          "extra_config": {
+            "modifier/martian": {
+              "fifo.Group": {
+                "scope": [
+                  "request",
+                  "response"
+                ],
+                "modifiers": [
+                  {
+                    "header.Blacklist": {
+                      "scope": [
+                        "request",
+                        "response"
+                      ],
+                      "names": [
+                        "Cookie",
+                        "Set-Cookie"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "modifier/lua-backend": {
+              "allow_open_libs": true,
+              "sources": [
+                "lua/script.lua",
+                "lua/rxi-json.lua"
+              ],
+              "md5": {
+                "lua/script.lua": "302f96876407a0018ccd627f76db121f",
+                "lua/rxi-json.lua": "99e51c5cdcfb9bd2bca4562a77397cfa"
+              },
+              "pre": "add_case_log_entry(request.load())",
+              "post": "local req = request.load(); handle_case_log_response(response.load(), req:params('CaseLog'));"
             }
+          }
         }
-    ]
-}
-    
-    ,
-      {
-    "endpoint": "/v1/{objectClass}/{objectId}/stimulus/{stimulus}",
-    "method": "POST",
-    "output_encoding": "no-op",
-    "input_query_strings": ["output_fields","api_comment"],
-    "input_headers": ["Authorization"],
-    "backend": [
+      ]
+    },
+    {
+      "endpoint": "/v1/{objectClass}/{objectId}/stimulus/{stimulus}",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_query_strings": [
+        "output_fields",
+        "api_comment"
+      ],
+      "input_headers": [
+        "Authorization"
+      ],
+      "backend": [
         {
-            "url_pattern": "/webservices/rest.php?version=1.4",
-            "sd": "static",
-            "method": "POST",
-            "disable_host_sanitize": false,
-            "extra_config":{
-            
-                "modifier/lua-backend": {
-                    "allow_open_libs": true,
-                    
-                    "sources": ["lua/script.lua"],
-                    "pre": "update_object_by_id(request.load(), true)",
-                    "post": "handle_object_response(response.load())"
-                }
+          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "sd": "static",
+          "method": "POST",
+          "disable_host_sanitize": false,
+          "encoding": "no-op",
+          "extra_config": {
+            "modifier/martian": {
+              "fifo.Group": {
+                "scope": [
+                  "request",
+                  "response"
+                ],
+                "modifiers": [
+                  {
+                    "header.Blacklist": {
+                      "scope": [
+                        "request",
+                        "response"
+                      ],
+                      "names": [
+                        "Cookie",
+                        "Set-Cookie"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "modifier/lua-backend": {
+              "allow_open_libs": true,
+              "sources": [
+                "lua/script.lua",
+                "lua/rxi-json.lua"
+              ],
+              "md5": {
+                "lua/script.lua": "302f96876407a0018ccd627f76db121f",
+                "lua/rxi-json.lua": "99e51c5cdcfb9bd2bca4562a77397cfa"
+              },
+              "pre": "update_object_by_id(request.load(), true)",
+              "post": "handle_object_response(response.load())"
             }
+          }
         }
-    ]
-}
-    
+      ]
+    }
   ],
   "output_encoding": "json",
   "disable_rest": true

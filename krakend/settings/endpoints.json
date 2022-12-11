@@ -47,7 +47,7 @@
       "method": "DELETE",
       "input_query_strings": [
         "api_comment",
-        ""
+        "simulate"
       ],
       "backend_req_script": "delete_object_by_id(request.load())",
       "backend_res_script": "handle_delete_response(response.load())"

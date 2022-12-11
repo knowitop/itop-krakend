@@ -3,7 +3,7 @@ services:
 
   apigw:
     container_name: apigw
-    image: devopsfaith/krakend:${KRAKEND_VERSION:-2.0.6}
+    image: devopsfaith/krakend:${KRAKEND_VERSION:-2.1.3}
     restart: unless-stopped
     volumes:
       - ./krakend:/etc/krakend
@@ -18,12 +18,14 @@ services:
       FC_SETTINGS: settings
       FC_TEMPLATES: templates
       FC_OUT: krakend.out.json
-      ITOP_HOST: http://host.docker.internal:8000
-#      ITOP_AUTH_USER: apigw
-#      ITOP_AUTH_PWD: apigw
-      # basic|url (todo)
-#      ITOP_AUTH_MODE: basic
+      ITOP_HOST: https://demo.knowitop.ru
+      ITOP_BASE_PATH: /itil
       ITOP_API_COMMENT: iTop Proxy API
+      # basic|url (todo?)
+      # ITOP_AUTH_MODE: basic
+      # ITOP_AUTH_USER: apigw
+      # ITOP_AUTH_PWD: 1qazXSW@3e
+      # COOKIE_PASS: 1
       # LUA_LIVE_RELOAD: 1
     command: run -c krakend.json.tmpl
 

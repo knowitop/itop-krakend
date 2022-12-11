@@ -171,7 +171,7 @@ end
 
 local function modify_response(res, statusCode, jsonData)
     res:statusCode(statusCode)
-    local bodyString = json.encode(jsonData);
+    local bodyString = json.encode(jsonData)
     res:body(bodyString)
     res:headers('Content-Length', tostring(string.len(bodyString)))
 end
