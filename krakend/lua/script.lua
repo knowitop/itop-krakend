@@ -346,7 +346,8 @@ function handle_case_log_response(res, caseLog)
     if resData.objects then
         for key, object in pairs(resData.objects) do
             resData = object
-            resData[caseLog] = object['fields'][caseLog]['entries']
+            resData['case_log'] = caseLog
+            resData['entries'] = object['fields'][caseLog]['entries']
             resData['fields'] = nil
         end
     else
