@@ -84,7 +84,9 @@ paths:
             schema:
               type: object
               description: Object fields with values to create a new object
-              example: { "org_id": 1, "title": "New user request", "description": "Request description" }
+            examples:
+              extKey:
+                $ref: '#/components/examples/ExtKeyFieldsExample'
       responses:
         201:
           description: Created object
@@ -267,6 +269,47 @@ paths:
           $ref: '#/components/responses/Error502'
         default:
           $ref: '#/components/responses/ErrorDefault'
+  /v1/{objectClass}/{objectId}/stimulus/{stimulus}:
+    parameters:
+      - $ref: '#/components/parameters/ObjectClassParameter'
+      - $ref: '#/components/parameters/ObjectIdParameter'
+      - $ref: '#/components/parameters/StimulusParameter'
+      - $ref: '#/components/parameters/OutputFieldsParameter'
+      - $ref: '#/components/parameters/ApiCommentParameter'
+    post:
+      operationId: applyObjectStimulus
+      summary: Apply a stimulus to the specified object
+      description: Apply lifecycle transitions (aka 'stimulus', like 'assign', 'resolve', etc.) to objects with an existing lifecycle.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Object fields with values to be updated during the transition
+              example: { "team_id": 10, "agent_id": 34 }
+      responses:
+        200:
+          description: Updated object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectWithFieldsSchema'
+        400:
+          $ref: '#/components/responses/Error400'
+        401:
+          $ref: '#/components/responses/Error401'
+        403:
+          $ref: '#/components/responses/Error403'
+        404:
+          $ref: '#/components/responses/Error404'
+        422:
+          $ref: '#/components/responses/Error422'
+        500:
+          $ref: '#/components/responses/Error500'
+        502:
+          $ref: '#/components/responses/Error502'
+        default:
+          $ref: '#/components/responses/ErrorDefault'
 components:
   parameters:
     ObjectClassParameter:
@@ -293,6 +336,14 @@ components:
       schema:
         type: string
         example: public_log
+    StimulusParameter:
+      name: stimulus
+      in: path
+      required: true
+      description: Stimulus name
+      schema:
+        type: string
+        example: ev_assign, ev_resolve
     OutputFieldsParameter:
       name: output_fields
       description: Mapped to the `output_fields` property in standard json_data.
@@ -519,3 +570,18 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorSchema'
+  examples:
+    ExtKeyFieldsExample:
+      summary: External key fields example
+      description: Specify external key fields as a number, a nested object or an OQL query
+      value: {
+        "org_id": 10,
+        "caller_id": {
+          "email": "johndoe@acme.corp",
+          "status": "active",
+          "org_id": "10"
+        },
+        "service_id": "SELECT Service WHERE name = 'Office Support'",
+        "title": "New user request",
+        "description": "Request description"
+      }
