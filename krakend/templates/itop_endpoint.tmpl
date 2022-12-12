@@ -4,7 +4,7 @@
     "output_encoding": "no-op",
     "input_query_strings": {{ marshal .input_query_strings }},
     "input_headers": [
-        {{ if empty (env "ITOP_AUTH_MODE" | trim) }}
+        {{ if empty (env "ITOP_AUTH_USER" | trim) }}
             "Authorization"
             {{ if eq (env "COOKIE_PASS") "1" }}
                 , "Cookie"
@@ -13,7 +13,7 @@
     ],
     "backend": [
         {
-            "url_pattern": "{{ env "ITOP_BASE_PATH" }}/webservices/rest.php?version=1.4",
+            "url_pattern": "{{ env "ITOP_BASE_PATH" }}/webservices/rest.php?version=1.4&login_mode={{ default "basic" (env "ITOP_AUTH_MODE" | trim) }}",
             "sd": "static",
             "method": "POST",
             "disable_host_sanitize": false,
@@ -23,7 +23,7 @@
                     "fifo.Group": {
                         "scope": ["request", "response"],
                         "modifiers": [
-                            {{ if eq (env "ITOP_AUTH_MODE" | trim) "basic" }}
+                            {{ if not (empty (env "ITOP_AUTH_USER" | trim)) }}
                                 {
                                     "header.Modifier": {
                                         "scope": ["request"],

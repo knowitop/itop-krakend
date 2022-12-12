@@ -58,7 +58,7 @@
       ],
       "backend": [
         {
-          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "url_pattern": "/itil/webservices/rest.php?version=1.4&login_mode=basic",
           "sd": "static",
           "method": "POST",
           "disable_host_sanitize": false,
@@ -116,7 +116,7 @@
       ],
       "backend": [
         {
-          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "url_pattern": "/itil/webservices/rest.php?version=1.4&login_mode=basic",
           "sd": "static",
           "method": "POST",
           "disable_host_sanitize": false,
@@ -173,7 +173,7 @@
       ],
       "backend": [
         {
-          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "url_pattern": "/itil/webservices/rest.php?version=1.4&login_mode=basic",
           "sd": "static",
           "method": "POST",
           "disable_host_sanitize": false,
@@ -231,7 +231,7 @@
       ],
       "backend": [
         {
-          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "url_pattern": "/itil/webservices/rest.php?version=1.4&login_mode=basic",
           "sd": "static",
           "method": "POST",
           "disable_host_sanitize": false,
@@ -289,7 +289,7 @@
       ],
       "backend": [
         {
-          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "url_pattern": "/itil/webservices/rest.php?version=1.4&login_mode=basic",
           "sd": "static",
           "method": "POST",
           "disable_host_sanitize": false,
@@ -344,7 +344,7 @@
       ],
       "backend": [
         {
-          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "url_pattern": "/itil/webservices/rest.php?version=1.4&login_mode=basic",
           "sd": "static",
           "method": "POST",
           "disable_host_sanitize": false,
@@ -401,7 +401,7 @@
       ],
       "backend": [
         {
-          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "url_pattern": "/itil/webservices/rest.php?version=1.4&login_mode=basic",
           "sd": "static",
           "method": "POST",
           "disable_host_sanitize": false,
@@ -459,7 +459,7 @@
       ],
       "backend": [
         {
-          "url_pattern": "/itil/webservices/rest.php?version=1.4",
+          "url_pattern": "/itil/webservices/rest.php?version=1.4&login_mode=basic",
           "sd": "static",
           "method": "POST",
           "disable_host_sanitize": false,

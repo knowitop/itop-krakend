@@ -585,3 +585,11 @@ components:
         "title": "New user request",
         "description": "Request description"
       }
+  securitySchemes:
+    basicAuth:
+      name: Basic
+      description: HTTP authentication, the iTop configuration parameter `allowed_login_types` must include the value `basic`.
+      type: http
+      scheme: basic
+security:
+  - basic: []

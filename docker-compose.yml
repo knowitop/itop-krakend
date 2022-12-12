@@ -8,10 +8,10 @@ services:
     volumes:
       - ./krakend:/etc/krakend
     ports:
-      - "8080:8000"
+      - "8080:8080"
     environment:
       KRAKEND_NAME: iTop REST API Gateway
-      KRAKEND_PORT: 8000
+      KRAKEND_PORT: 8080
       USAGE_DISABLE: 1
       FC_ENABLE: 1
       FC_PARTIALS: partials
@@ -28,6 +28,19 @@ services:
       # COOKIE_PASS: 1
       # LUA_LIVE_RELOAD: 1
     command: run -c krakend.json.tmpl
+
+
+  swagger:
+    container_name: swagger
+    image: swaggerapi/swagger-ui:${SWAGGER_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    environment:
+      # https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/configuration.md
+      URL: /specs/open-api.yaml
+    volumes:
+      - ./open-api.yaml:/usr/share/nginx/html/specs/open-api.yaml
 
 #  itop:
 #    image: vbkunin/itop:${ITOP_VERSION:-3.0.0}
