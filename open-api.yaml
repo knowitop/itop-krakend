@@ -1,7 +1,10 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: iTop REST API Gateway
   version: 0.1.0
+  contact:
+    name: Vladimir Kunin
+    url: https://github.com/knowitop/itop-krakend
 servers:
   - url: http://localhost:8080
 paths:
@@ -18,7 +21,7 @@ paths:
         - $ref: '#/components/parameters/WhereParameter'
         - $ref: '#/components/parameters/FilterParameter'
       responses:
-        200:
+        "200":
           description: List of objects with pagination
           content:
             application/json:
@@ -58,17 +61,17 @@ paths:
                         format: integer
                         description: Total objects
                         example: 11
-        400:
+        "400":
           $ref: '#/components/responses/Error400'
-        401:
+        "401":
           $ref: '#/components/responses/Error401'
-        403:
+        "403":
           $ref: '#/components/responses/Error403'
-        422:
+        "422":
           $ref: '#/components/responses/Error422'
-        500:
+        "500":
           $ref: '#/components/responses/Error500'
-        502:
+        "502":
           $ref: '#/components/responses/Error502'
         default:
           $ref: '#/components/responses/ErrorDefault'
@@ -88,23 +91,23 @@ paths:
               extKey:
                 $ref: '#/components/examples/ExtKeyFieldsExample'
       responses:
-        201:
+        "201":
           description: Created object
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ObjectWithFieldsSchema'
-        400:
+        "400":
           $ref: '#/components/responses/Error400'
-        401:
+        "401":
           $ref: '#/components/responses/Error401'
-        403:
+        "403":
           $ref: '#/components/responses/Error403'
-        422:
+        "422":
           $ref: '#/components/responses/Error422'
-        500:
+        "500":
           $ref: '#/components/responses/Error500'
-        502:
+        "502":
           $ref: '#/components/responses/Error502'
         default:
           $ref: '#/components/responses/ErrorDefault'
@@ -117,22 +120,22 @@ paths:
       operationId: getObject
       summary: Get an object
       responses:
-        200:
+        "200":
           description: Requested object
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ObjectWithFieldsSchema'
-        401:
+        "401":
           $ref: '#/components/responses/Error401'
-        403:
+        "403":
           $ref: '#/components/responses/Error403'
-        404:
+        "404":
           $ref: '#/components/responses/Error404'
-        500:
+        "500":
           $ref: '#/components/responses/Error500'
-        502:
-          $ref: '#/components/responses/Error502'
+        "502":
+          $ref: "#/components/responses/Error502"
         default:
           $ref: '#/components/responses/ErrorDefault'
     put:
@@ -148,25 +151,25 @@ paths:
               description: Object fields with values to update
               example: { "title": "New desktop for Paul", "service_id": 12, "servicesubcategory_id": 45 }
       responses:
-        200:
+        "200":
           description: Updated object
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ObjectWithFieldsSchema'
-        400:
+        "400":
           $ref: '#/components/responses/Error400'
-        401:
+        "401":
           $ref: '#/components/responses/Error401'
-        403:
+        "403":
           $ref: '#/components/responses/Error403'
-        404:
+        "404":
           $ref: '#/components/responses/Error404'
-        422:
+        "422":
           $ref: '#/components/responses/Error422'
-        500:
+        "500":
           $ref: '#/components/responses/Error500'
-        502:
+        "502":
           $ref: '#/components/responses/Error502'
         default:
           $ref: '#/components/responses/ErrorDefault'
@@ -178,7 +181,7 @@ paths:
         - $ref: '#/components/parameters/ApiCommentParameter'
         - $ref: '#/components/parameters/SimulateParameter'
       responses:
-        200:
+        "200":
           description: Deleted and updated objects
           content:
             application/json:
@@ -195,17 +198,17 @@ paths:
                   message:
                     type: string
                     example: "SIMULATING: Deleted: 1 plus (for DB integrity) 5"
-        401:
+        "401":
           $ref: '#/components/responses/Error401'
-        403:
+        "403":
           $ref: '#/components/responses/Error403'
-        404:
+        "404":
           $ref: '#/components/responses/Error404'
-        422:
+        "422":
           $ref: '#/components/responses/Error422'
-        500:
+        "500":
           $ref: '#/components/responses/Error500'
-        502:
+        "502":
           $ref: '#/components/responses/Error502'
         default:
           $ref: '#/components/responses/ErrorDefault'
@@ -218,21 +221,21 @@ paths:
       operationId: getObjectCaseLogEntries
       summary: Get object case log entries
       responses:
-        200:
+        "200":
           description: Requested case log content
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ObjectWithCaseLogSchema'
-        401:
+        "401":
           $ref: '#/components/responses/Error401'
-        403:
+        "403":
           $ref: '#/components/responses/Error403'
-        404:
+        "404":
           $ref: '#/components/responses/Error404'
-        500:
+        "500":
           $ref: '#/components/responses/Error500'
-        502:
+        "502":
           $ref: '#/components/responses/Error502'
         default:
           $ref: '#/components/responses/ErrorDefault'
@@ -247,25 +250,25 @@ paths:
             schema:
               $ref: '#/components/schemas/CaseLogSchema'
       responses:
-        200:
+        "200":
           description: Updated case log content
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ObjectWithCaseLogSchema'
-        400:
+        "400":
           $ref: '#/components/responses/Error400'
-        401:
+        "401":
           $ref: '#/components/responses/Error401'
-        403:
+        "403":
           $ref: '#/components/responses/Error403'
-        404:
+        "404":
           $ref: '#/components/responses/Error404'
-        422:
+        "422":
           $ref: '#/components/responses/Error422'
-        500:
+        "500":
           $ref: '#/components/responses/Error500'
-        502:
+        "502":
           $ref: '#/components/responses/Error502'
         default:
           $ref: '#/components/responses/ErrorDefault'
@@ -288,25 +291,25 @@ paths:
               description: Object fields with values to be updated during the transition
               example: { "team_id": 10, "agent_id": 34 }
       responses:
-        200:
+        "200":
           description: Updated object
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ObjectWithFieldsSchema'
-        400:
+        "400":
           $ref: '#/components/responses/Error400'
-        401:
+        "401":
           $ref: '#/components/responses/Error401'
-        403:
+        "403":
           $ref: '#/components/responses/Error403'
-        404:
+        "404":
           $ref: '#/components/responses/Error404'
-        422:
+        "422":
           $ref: '#/components/responses/Error422'
-        500:
+        "500":
           $ref: '#/components/responses/Error500'
-        502:
+        "502":
           $ref: '#/components/responses/Error502'
         default:
           $ref: '#/components/responses/ErrorDefault'
@@ -477,7 +480,7 @@ components:
         user_id:
           type: string
           description: Entry author user ID (by default, the credentials used for the request), can only be set by users with the `Administrator` profile
-          example: 20
+          example: "20"
         message:
           type: string
           example: Hello REST API
@@ -587,9 +590,8 @@ components:
       }
   securitySchemes:
     basicAuth:
-      name: Basic
-      description: HTTP authentication, the iTop configuration parameter `allowed_login_types` must include the value `basic`.
       type: http
       scheme: basic
+      description: HTTP authentication, the iTop configuration parameter `allowed_login_types` must include the value `basic`.
 security:
-  - basic: []
+  - basicAuth: []
